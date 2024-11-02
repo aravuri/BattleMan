@@ -21,7 +21,7 @@ while entropy(wordPDF) > 0:
         answer = input("Invalid answer. Try again.\n")
     
     info.append((c, answer))
-    print(info)
+    # print(info)
 
     # update word pdf
     wordPDF = condition(wordPDF, c, answer)
