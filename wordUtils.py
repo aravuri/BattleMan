@@ -1,5 +1,6 @@
 import wordfreq
 from functools import partial
+from math import log2
 import re
 
 def isValid(word, length):
@@ -27,7 +28,12 @@ def printPDF(pdf):
     for k,v in sorted(pdf.items(), key=lambda p:p[1], reverse=True):
         print(k,v)
 
+def entropy(pdf):
+    return sum(-p*log2(p) for p in pdf.values())
+
+
 
 pdf = topPDFUniform(7)
 marginalPDF = marginalPDFchar(pdf, 'a')
 printPDF(marginalPDF)
+print(entropy(pdf), entropy(marginalPDF))
