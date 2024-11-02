@@ -13,7 +13,11 @@ def top(wordLength, cutoff=10000):
 # p(word)
 def topPDFUniform(wordLength, cutoff=10000):
     arr = top(wordLength, cutoff);
-    return dict(map(lambda word: (word, 1.0/len(arr)), arr))
+    return normalize(dict(map(lambda word: (word, 1.0), arr)))
+
+def topPDFFreq(wordLength, cutoff=10000):
+    arr = top(wordLength, cutoff);
+    return normalize(dict(map(lambda word: (word, wordfreq.word_frequency(word, 'en')), arr)))
 
 # p(c?)
 def marginalPDFchar(wordPDF, c):
@@ -29,13 +33,12 @@ def marginalPDFchar(wordPDF, c):
 # p(word | c? = string)
 def condition(wordPDF, c, string):
     ret = {}
-    probc = marginalPDFchar(wordPDF, c)[string]
     for word, prob in wordPDF.items():
         # replaces everything that isn't c with '_'
         queryResult = re.sub(f'[^{c}]', "_", word)
         if queryResult == string:
-            ret[word] = prob / probc
-    return ret
+            ret[word] = prob
+    return normalize(ret)
 
 def printPDF(pdf):
     for k,v in sorted(pdf.items(), key=lambda p:p[1], reverse=True):
@@ -44,10 +47,14 @@ def printPDF(pdf):
 def entropy(pdf):
     return sum(-p*log2(p) for p in pdf.values())
 
+def normalize(pdf):
+    norm = sum(pdf.values())
+    return {x: p/norm for x, p in pdf.items()}
 
 
-# pdf = topPDFUniform(7)
+
+# pdf = topPDFFreq(7)
 # marginalPDF = marginalPDFchar(pdf, 'a')
 # condPDF = condition(pdf, 'c', 'c______')
-# printPDF(condPDF)
+# printPDF(marginalPDF)
 # print(entropy(pdf), entropy(marginalPDF), entropy(condPDF))

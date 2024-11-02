@@ -9,7 +9,7 @@ n = int(input("How many letters?\n"))
 finished = False
 info = []
 
-wordPDF = topPDFUniform(n)
+wordPDF = topPDFFreq(n, cutoff=100000)
 
 while entropy(wordPDF) > 0:
     # guess a character
