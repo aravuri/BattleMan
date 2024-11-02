@@ -1,16 +1,19 @@
 import re
+import string
+import numpy as np
+from wordUtils import *
 
-def guessChar(string):
-    return "a"
+possibleGuesses = list(string.ascii_lowercase)
 
 n = int(input("How many letters?\n"))
 finished = False
 info = []
 
+wordPDF = topPDFUniform(n)
 
-while not finished:
+while entropy(wordPDF) > 0:
     # guess a character
-    c = guessChar(info)
+    c = possibleGuesses[np.argmax(np.array(list(map(lambda c: entropy(marginalPDFchar(wordPDF, c)), possibleGuesses))))]
 
     # have them input where it is ("_a__a_")
     answer = input(f'{c}?\n')
@@ -19,4 +22,8 @@ while not finished:
     
     info.append((c, answer))
     print(info)
+
+    # update word pdf
+    wordPDF = condition(wordPDF, c, answer)
     
+print(f'The word is: {wordPDF.keys()}')

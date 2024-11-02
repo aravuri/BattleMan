@@ -10,18 +10,30 @@ def top(wordLength, cutoff=10000):
     words = wordfreq.top_n_list('en', cutoff, wordlist='best')
     return list(filter(partial(isValid, length=wordLength), words));
 
+# p(word)
 def topPDFUniform(wordLength, cutoff=10000):
     arr = top(wordLength, cutoff);
     return dict(map(lambda word: (word, 1.0/len(arr)), arr))
 
-def marginalPDFchar(wordPdf, c):
+# p(c?)
+def marginalPDFchar(wordPDF, c):
     ret = {}
-    for word, prob in pdf.items():
+    for word, prob in wordPDF.items():
         queryResult = re.sub(f'[^{c}]', "_", word)
         if queryResult in ret:
             ret[queryResult] += prob
         else:
             ret[queryResult] = prob
+    return ret
+
+# p(word | c? = string)
+def condition(wordPDF, c, string):
+    ret = {}
+    normConst = marginalPDFchar(wordPDF, c)[string]
+    for word, prob in wordPDF.items():
+        queryResult = re.sub(f'[^{c}]', "_", word)
+        if queryResult == string:
+            ret[word] = prob / normConst
     return ret
 
 def printPDF(pdf):
@@ -33,7 +45,8 @@ def entropy(pdf):
 
 
 
-pdf = topPDFUniform(7)
-marginalPDF = marginalPDFchar(pdf, 'a')
-printPDF(marginalPDF)
-print(entropy(pdf), entropy(marginalPDF))
+# pdf = topPDFUniform(7)
+# marginalPDF = marginalPDFchar(pdf, 'a')
+# condPDF = condition(pdf, 'c', 'c______')
+# printPDF(condPDF)
+# print(entropy(pdf), entropy(marginalPDF), entropy(condPDF))
