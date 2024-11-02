@@ -10,14 +10,16 @@ def top(wordLength, cutoff=10000):
     words = wordfreq.top_n_list('en', cutoff, wordlist='best')
     return list(filter(partial(isValid, length=wordLength), words));
 
-# p(word)
-def topPDFUniform(wordLength, cutoff=10000):
+# p(word), sampling = uniform or frequency
+def topPDF(wordLength, cutoff=10000, sampling='uniform'):
     arr = top(wordLength, cutoff);
-    return normalize(dict(map(lambda word: (word, 1.0), arr)))
-
-def topPDFFreq(wordLength, cutoff=10000):
-    arr = top(wordLength, cutoff);
-    return normalize(dict(map(lambda word: (word, wordfreq.word_frequency(word, 'en')), arr)))
+    if (sampling == 'uniform'):
+        func = lambda word: (word, 1.0)
+    elif (sampling == 'frequency'):
+        func = lambda word: (word, wordfreq.word_frequency(word, 'en'))
+    else:
+        raise RuntimeError("oops")
+    return normalize(dict(map(func, arr)))
 
 # p(c?)
 def marginalPDFchar(wordPDF, c):
@@ -56,5 +58,5 @@ def normalize(pdf):
 # pdf = topPDFFreq(7)
 # marginalPDF = marginalPDFchar(pdf, 'a')
 # condPDF = condition(pdf, 'c', 'c______')
-# printPDF(marginalPDF)
+# printPDF(pdf)
 # print(entropy(pdf), entropy(marginalPDF), entropy(condPDF))
