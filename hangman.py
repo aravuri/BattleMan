@@ -26,4 +26,4 @@ while entropy(wordPDF) > 0:
     # update word pdf
     wordPDF = condition(wordPDF, c, answer)
     
-print(f'The word is: {wordPDF.keys()}')
+print(f'The word is: {list(wordPDF.keys())[0]}')
