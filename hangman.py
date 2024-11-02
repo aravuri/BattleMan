@@ -9,7 +9,7 @@ n = int(input("How many letters?\n"))
 finished = False
 info = []
 
-wordPDF = topPDF(n, cutoff=10000, sampling='uniform')
+wordPDF = topPDF(n, cutoff=10000, sampling='frequency')
 
 while entropy(wordPDF) > 0:
     # guess a character
@@ -25,5 +25,6 @@ while entropy(wordPDF) > 0:
 
     # update word pdf
     wordPDF = condition(wordPDF, c, answer)
+    print(f'Current most likely word: {max(wordPDF, key=wordPDF.get)}, p={max(wordPDF.values())}')
     
 print(f'The word is: {list(wordPDF.keys())[0]}')
