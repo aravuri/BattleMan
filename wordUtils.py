@@ -29,11 +29,12 @@ def marginalPDFchar(wordPDF, c):
 # p(word | c? = string)
 def condition(wordPDF, c, string):
     ret = {}
-    normConst = marginalPDFchar(wordPDF, c)[string]
+    probc = marginalPDFchar(wordPDF, c)[string]
     for word, prob in wordPDF.items():
+        # replaces everything that isn't c with '_'
         queryResult = re.sub(f'[^{c}]', "_", word)
         if queryResult == string:
-            ret[word] = prob / normConst
+            ret[word] = prob / probc
     return ret
 
 def printPDF(pdf):
