@@ -55,7 +55,7 @@ def normalize(pdf):
 
 
 
-# pdf = topPDFFreq(7)
+# pdf = topPDF(7, 100000, 'frequency')
 # marginalPDF = marginalPDFchar(pdf, 'a')
 # condPDF = condition(pdf, 'c', 'c______')
 # printPDF(pdf)
