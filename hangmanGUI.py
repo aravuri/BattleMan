@@ -5,9 +5,10 @@ def initGUI():
     root.geometry("300x50")
     return root
 
-def clickLetter(i):
+def clickLetter(i, letter):
     def func():
         if (buttons[i].cget("text")=="_"):
+            buttons[i].config(text = letter)
             buttons[i].config(state = DISABLED)
     return func
 def clickDone():
@@ -28,7 +29,7 @@ def guessing(word, letter, number):
     inputFrame = Frame(root)
     inputFrame.grid(row=1, column = 0)
     global buttons 
-    buttons = [Button(inputFrame, text = word[i], command = clickLetter(i)) for i in range(len(word))]
+    buttons = [Button(inputFrame, text = word[i], command = clickLetter(i, letter)) for i in range(len(word))]
     buttons.append(Button(inputFrame, text = "Done", command = clickDone))
 
     for i in range(len(buttons)):
