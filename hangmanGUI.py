@@ -21,7 +21,7 @@ def clickDone():
     buttons[-1].config(state = DISABLED)
     root.quit()
 def guessing(word, letter, number):
-    root.geometry(str(len(word)*50+50)+"x50")
+    root.geometry(str(len(word)*50+55)+"x50")
     textFrame = Frame(root)
     textFrame.grid(row = 0, column = 0)
     letterAsked = Label(textFrame, text = str(number) + ". Is " + letter + " in your word?")
