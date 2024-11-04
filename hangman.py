@@ -42,6 +42,9 @@ while wordRV.entropy() > 0:
     # print(f'Current most likely word: {max(wordRV.pdf, key=wordRV.pdf.get)}, p={max(wordRV.pdf.values())}')
     count += 1
 if mistakes == 11:
-    finishCall(root, "You failed.")
+    finishCall(root, "I failed.")
 else:
-    finishCall(root,f'The word is {list(wordRV.pdf.keys())[0]}!')
+    if len(list(wordRV.pdf.keys()))==0:
+        finishCall(root, "I failed.")
+    print(list(wordRV.pdf.keys()))
+    finishCall(root, f'The word is {list(wordRV.pdf.keys())[0]}!')
