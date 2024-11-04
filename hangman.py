@@ -14,7 +14,10 @@ info = []
 
 wordRV = topRV(n, cutoff=100000, sampling='frequency')
 count = 1
+mistakes = 0
 while wordRV.entropy() > 0:
+    if mistakes==11:
+        break
     # guess a character
     c = possibleGuesses[np.argmax(np.array(list(map(lambda c: wordRV.apply(query(c)).entropy()/wordRV.apply(query(c))['_'*n], possibleGuesses))))]
     
@@ -25,7 +28,8 @@ while wordRV.entropy() > 0:
                 outStr[i] = l
 
     # have them input where it is ("_a__a_")
-    answer = guessCall(root, "".join(outStr), c, count, wordRV)
+    answer = guessCall(root, "".join(outStr), c, count, mistakes, wordRV)
+    if answer == "_"*len(answer): mistakes+=1
     #answer = input(f'{c}?\n')
     while len(answer) != n or not re.match(f'^[{c}_]*$', answer):
         answer = input("Invalid answer. Try again.\n")
@@ -37,4 +41,7 @@ while wordRV.entropy() > 0:
     wordRV = wordRV.condition(query(c), answer)
     # print(f'Current most likely word: {max(wordRV.pdf, key=wordRV.pdf.get)}, p={max(wordRV.pdf.values())}')
     count += 1
-finishCall(root,f'The word is {list(wordRV.pdf.keys())[0]}!')
+if mistakes == 11:
+    finishCall(root, "You failed.")
+else:
+    finishCall(root,f'The word is {list(wordRV.pdf.keys())[0]}!')
