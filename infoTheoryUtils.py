@@ -11,8 +11,13 @@ class RV:
     def __getitem__(self, x):
         return self.pdf[x]
 
-    def printPDF(self):
-        for x,p in sorted(self.pdf.items(), key=lambda p:p[1], reverse=True):
+    # gets a string the n most likely values
+    def topString(self, n=1000):
+        return '\n'.join(list(map(lambda pair: f'{pair[0]}, p={pair[1]}', sorted(self.pdf.items(), key=lambda p:p[1], reverse=True)[0:n])))
+
+    # prints the n most likely values
+    def printPDF(self, n=1000):
+        for x,p in sorted(self.pdf.items(), key=lambda p:p[1], reverse=True)[0:n]:
             print(x,p)
     
     # Gets the distribution of f(X).

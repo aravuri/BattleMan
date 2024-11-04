@@ -20,8 +20,8 @@ def clickDone():
             buttons[i].config(state = NORMAL)
     buttons[-1].config(state = DISABLED)
     root.quit()
-def guessing(word, letter, number):
-    root.geometry(str(len(word)*50+50)+"x50")
+def guessing(word, letter, number, wordRV):
+    root.geometry(str(len(word)*50+50)+"x300")
     textFrame = Frame(root)
     textFrame.grid(row = 0, column = 0)
     letterAsked = Label(textFrame, text = str(number) + ". Is " + letter + " in your word?")
@@ -34,6 +34,12 @@ def guessing(word, letter, number):
 
     for i in range(len(buttons)):
         buttons[i].grid(row=0,column = i)
+    
+    textFrame2 = Frame(root)
+    textFrame2.grid(row=2, column=0)
+    text = Label(textFrame2, text="Most Likely Words:\n"+wordRV.topString(10))
+    text.grid(row = 0, column=0)
+
     root.mainloop()
 
 def destroy(root):
@@ -44,10 +50,10 @@ def destroy(root):
 def globalizeRoot(r):
     global root
     root = r
-def guessCall(root, word, letter, number):
+def guessCall(root, word, letter, number, wordRV):
     destroy(root)
     globalizeRoot(root)
-    guessing(word, letter, number)
+    guessing(word, letter, number, wordRV)
     ret = ["_"]*len(word)
     for i in range(len(ret)):
         if i in positions:
