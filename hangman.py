@@ -12,11 +12,11 @@ n = int(startCall(root))
 finished = False
 info = []
 
-wordPDF = topPDF(n, cutoff=100000, sampling='frequency')
+wordRV = topRV(n, cutoff=100000, sampling='frequency')
 count = 1
-while entropy(wordPDF) > 0:
+while wordRV.entropy() > 0:
     # guess a character
-    c = possibleGuesses[np.argmax(np.array(list(map(lambda c: entropy(marginalPDFchar(wordPDF, c)), possibleGuesses))))]
+    c = possibleGuesses[np.argmax(np.array(list(map(lambda c: wordRV.marginal(query(c)).entropy(), possibleGuesses))))]
     
     outStr = ["_"]*n
     for (l, ans) in info:
@@ -34,7 +34,7 @@ while entropy(wordPDF) > 0:
     # print(info)
 
     # update word pdf
-    wordPDF = condition(wordPDF, c, answer)
-    print(f'Current most likely word: {max(wordPDF, key=wordPDF.get)}, p={max(wordPDF.values())}')
+    wordRV = wordRV.condition(query(c), answer)
+    print(f'Current most likely word: {max(wordRV.pdf, key=wordRV.pdf.get)}, p={max(wordRV.pdf.values())}')
     count += 1
-finishCall(root,f'The word is {list(wordPDF.keys())[0]}!')
+finishCall(root,f'The word is {list(wordRV.pdf.keys())[0]}!')
