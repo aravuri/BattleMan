@@ -1,8 +1,19 @@
 import re
 import string
 import numpy as np
+from functools import partial
 from wordUtils import *
 from hangmanGUI import *
+
+def optimization(c, rv=None):
+    queryRV = rv.apply(query(c))
+    h = queryRV.entropy()
+    # classic floating point precision
+    if abs(h) <= 1e-9:
+        return 0
+    if abs(queryRV['_'*n]) <= 1e-9:
+        return float('inf')
+    return h/queryRV['_'*n]
 
 root = initGUI()
 
@@ -19,7 +30,7 @@ while wordRV.entropy() > 0:
     if mistakes==11:
         break
     # guess a character
-    c = possibleGuesses[np.argmax(np.array(list(map(lambda c: wordRV.apply(query(c)).entropy()/wordRV.apply(query(c))['_'*n], possibleGuesses))))]
+    c = possibleGuesses[np.argmax(np.array(list(map(partial(optimization, rv=wordRV), possibleGuesses))))]
     
     outStr = ["_"]*n
     for (l, ans) in info:

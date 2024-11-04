@@ -9,7 +9,10 @@ class RV:
 
     # P(X = x)
     def __getitem__(self, x):
-        return self.pdf[x]
+        if x in self.pdf.keys():
+            return self.pdf[x]
+        return 0
+            
 
     # gets a string the n most likely values
     def topString(self, n=1000):
@@ -55,5 +58,3 @@ class RV:
 def normalize(pdf):
     norm = sum(pdf.values())
     return {x: p/norm for x, p in pdf.items()}
-
-
