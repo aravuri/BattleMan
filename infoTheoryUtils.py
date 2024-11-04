@@ -2,19 +2,20 @@ from math import log2
 
 # Represents a random variable.
 class RV:
+    # dict: a mapping from an object to a probability
     def __init__(self, dict):
         self.pdf = dict
         pass
 
     def printPDF(self):
-        for k,v in sorted(self.pdf.items(), key=lambda p:p[1], reverse=True):
-            print(k,v)
+        for x,p in sorted(self.pdf.items(), key=lambda p:p[1], reverse=True):
+            print(x,p)
 
     def entropy(self):
         return sum(-p*log2(p) for p in self.pdf.values())
     
     # Treating this as the distribution of X, gets the distribution of f(X).
-    def marginal(self, f):
+    def apply(self, f):
         ret = {}
         for x, p in self.pdf.items():
             xPrime = f(x)

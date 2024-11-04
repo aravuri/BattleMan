@@ -16,7 +16,7 @@ wordRV = topRV(n, cutoff=100000, sampling='frequency')
 count = 1
 while wordRV.entropy() > 0:
     # guess a character
-    c = possibleGuesses[np.argmax(np.array(list(map(lambda c: wordRV.marginal(query(c)).entropy(), possibleGuesses))))]
+    c = possibleGuesses[np.argmax(np.array(list(map(lambda c: wordRV.apply(query(c)).entropy(), possibleGuesses))))]
     
     outStr = ["_"]*n
     for (l, ans) in info:
