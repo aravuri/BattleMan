@@ -9,16 +9,18 @@ import math
 def optimization(c, rv=None, rvTruth=None, p=0):
     queryRV = rv.apply(query(c))
 
-    # h = queryRV.entropy()
-    # # classic floating point precision
-    # if abs(h) <= 1e-9:
-    #     return 0
-    # if abs(queryRV['_'*n]) <= 1e-9:
-    #     return float('inf')
-    # return h/queryRV['_'*n]
+    h = queryRV.entropy()
+    # classic floating point precision
+    prob = queryRV['_'*n]
+    prob = prob + (1-prob)*(1-p)
+    if abs(h) <= 1e-9:
+        return 0
+    if abs(prob) <= 1e-9:
+        return float('inf')
+    return h/prob
 
     # going back to regular entropy for now
-    return queryRV.entropy()
+    # return queryRV.entropy()
 
 # the probability that you will lie, given that you are able to.
 def lieDistribution(rv, rvTruth):
@@ -45,7 +47,7 @@ while wordRV.entropy() > 1E-3:
     if mistakes==7:
         break
     # guess a character
-    c = possibleGuesses[np.argmax(np.array(list(map(partial(optimization, rv=wordRV, rvTruth=wordRVTruth), possibleGuesses))))]
+    c = possibleGuesses[np.argmax(np.array(list(map(partial(optimization, rv=wordRV, rvTruth=wordRVTruth, p = pTruth), possibleGuesses))))]
     
     outStr = ["_"]*n
     for (l, ans) in info:

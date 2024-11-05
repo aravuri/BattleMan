@@ -47,7 +47,7 @@ def guessing(word, letter, number, numMistakes, wordRV):
      
     imageFrame = Frame(root)
     imageFrame.grid(row = 3, column = 0)
-    image = ImageTk.PhotoImage(Image.open("images/"+str(numMistakes)+".jpg"))
+    image = ImageTk.PhotoImage(Image.open("images/"+str(numMistakes//3)+".jpg"))
     label = Label(imageFrame, image=image)
     label.grid(row = 0, column = 0)
 
