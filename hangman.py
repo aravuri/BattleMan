@@ -6,8 +6,9 @@ from wordUtils import *
 from hangmanGUI import *
 import math
 
-def optimization(c, rv=None):
+def optimization(c, rv=None, rvTruth=None, p=0):
     queryRV = rv.apply(query(c))
+
     # h = queryRV.entropy()
     # # classic floating point precision
     # if abs(h) <= 1e-9:
@@ -19,11 +20,12 @@ def optimization(c, rv=None):
     # going back to regular entropy for now
     return queryRV.entropy()
 
-def lieDistribution(n):
+# the probability that you will lie, given that you are able to.
+def lieDistribution(rv, rvTruth):
     # rate = 1000
     # p = np.exp(-rate)*rate**n/(math.factorial(n))
     # poisson sucks lol
-    return (1/2)**n
+    return 0.25
 
 root = initGUI()
 
@@ -33,9 +35,9 @@ n = int(startCall(root))
 finished = False
 info = []
 
-wordRV = topRV(n, cutoff=100000, sampling='frequency')
-wordRVTruth = topRV(n, cutoff=100000, sampling='frequency')
-pTruth = 1.0
+wordRV = topRV(n, cutoff=100000, sampling='frequency') # the distribution of words given that there have been either 0 or 1 lies so far.
+wordRVTruth = topRV(n, cutoff=100000, sampling='frequency') # the distribution of words given that every statement so far has been true
+pTruth = 1.0 # the probability that every statement so far has been true
 count = 1
 mistakes = 0
 while wordRV.entropy() > 1E-3:
@@ -43,7 +45,7 @@ while wordRV.entropy() > 1E-3:
     if mistakes==7:
         break
     # guess a character
-    c = possibleGuesses[np.argmax(np.array(list(map(partial(optimization, rv=wordRV), possibleGuesses))))]
+    c = possibleGuesses[np.argmax(np.array(list(map(partial(optimization, rv=wordRV, rvTruth=wordRVTruth), possibleGuesses))))]
     
     outStr = ["_"]*n
     for (l, ans) in info:
@@ -68,8 +70,10 @@ while wordRV.entropy() > 1E-3:
     # update word pdf
     # truthValue = wordRV.apply(queryResult(c, answer))
     # print(truthValue[False])
-    wordRV = wordRV.fuzzyCondition(wordRVTruth, query(c), answer, lieDistribution(count))
+    pLieHere = pTruth * lieDistribution(wordRV, wordRVTruth)
+    wordRV = wordRV.fuzzyCondition(wordRVTruth, query(c), answer, pLieHere)
     wordRVTruth = wordRVTruth.condition(query(c), answer)
+    pTruth = pTruth - pLieHere
     # print(f'Current most likely word: {max(wordRV.pdf, key=wordRV.pdf.get)}, p={max(wordRV.pdf.values())}')
     count += 1
 if mistakes == 7 or len(list(wordRV.pdf.keys()))==0:
