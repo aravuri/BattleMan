@@ -21,7 +21,6 @@ def clickDone(letter):
         for i in range(len(buttons)-1):
             if (buttons[i].cget("text") == letter):
                 positions.append(i)
-        buttons[-1].config(state = DISABLED)
         root.quit()
     return func
 def guessing(word, letter, number, numMistakes, wordRV):
