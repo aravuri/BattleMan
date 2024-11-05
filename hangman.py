@@ -27,7 +27,7 @@ wordRV = topRV(n, cutoff=100000, sampling='frequency')
 count = 1
 mistakes = 0
 while wordRV.entropy() > 0:
-    if mistakes==11:
+    if mistakes==7:
         break
     # guess a character
     c = possibleGuesses[np.argmax(np.array(list(map(partial(optimization, rv=wordRV), possibleGuesses))))]
@@ -52,7 +52,7 @@ while wordRV.entropy() > 0:
     wordRV = wordRV.condition(query(c), answer)
     # print(f'Current most likely word: {max(wordRV.pdf, key=wordRV.pdf.get)}, p={max(wordRV.pdf.values())}')
     count += 1
-if mistakes == 11 or len(list(wordRV.pdf.keys()))==0:
+if mistakes == 7 or len(list(wordRV.pdf.keys()))==0:
     finishCall(root, "I failed.")
 else:
     finishCall(root, f'The word is {list(wordRV.pdf.keys())[0]}!')
