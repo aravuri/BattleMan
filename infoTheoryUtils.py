@@ -1,11 +1,11 @@
 from math import log2
+import numpy as np
 
 # Represents a random variable, X.
 class RV:
     # dict: a mapping from an object to a probability
     def __init__(self, dict):
         self.pdf = dict
-        pass
 
     # P(X = x)
     def __getitem__(self, x):
@@ -51,6 +51,61 @@ class RV:
     def conditionalEntropy(self, f):
         y = self.apply(f)
         return sum(-p*log2(p/y[f(x)]) for x, p in self.pdf.items())
+    
+    # E[X]
+    def expectation(self):
+        return sum(x*p for x, p in self.pdf.items())
+    
+
+# Represents a channel taking X to Y
+class Channel:
+
+    # inputSet = sampleSpace(X)
+    # outputSet = sampleSpace(Y) 
+    # transitionFunction(x ϵ sampleSpace(X), y ϵ sampleSpace(Y)) = P(Y=y | X=x)
+    def __init__(self, inputSet: list, outputSet: list, transitionFunction: function):
+        self.inputSet = inputSet
+        self.inputCode = {k: v for v, k in enumerate(inputSet)}
+        self.outputSet = outputSet
+        self.outputCode = {k: v for v, k in enumerate(outputSet)}
+        self.transitionMatrix = np.fromfunction(lambda inId, outId: transitionFunction(inputSet[inId], outputSet[outId]), (len(inputSet), len(outputSet)))
+    
+    # type = input or output
+    def vectorizeRV(self, rv: RV, type: str):
+        if type == 'input':
+            code = self.inputCode
+            set = self.inputSet
+        elif type == 'output':
+            code = self.outputCode
+            set = self.outputSet
+        
+        codeRV = rv.apply(lambda x: self.code[x])
+        return np.array([codeRV[i] for i in range(len(self.set))])
+    
+    def devectorizeRV(self, vector: np.ndarray, type: str):
+        if type == 'input':
+            code = self.inputCode
+            set = self.inputSet
+        elif type == 'output':
+            code = self.outputCode
+            set = self.outputSet
+        
+        return RV({set[id]: p for id, p in enumerate(vector)})
+
+
+    def transformDistribution(self, inputRV: RV):
+        inputVector = self.vectorizeRV(inputRV, type='input')
+        outputVector = self.transitionMatrix * inputVector
+        return self.devectorizeRV(outputVector, type='output')
+        
+        
+        
+
+        
+
+
+    
+
         
 
 

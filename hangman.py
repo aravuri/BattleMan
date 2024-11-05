@@ -11,8 +11,15 @@ def optimization(c, rv=None, rvTruth=None, p=0):
 
     h = queryRV.entropy()
     # classic floating point precision
-    prob = queryRV['_'*n]
-    prob = prob + (1-prob)*(1-p)
+
+    # def cost(queryValue):
+    #     if queryValue == '_'*n:
+    #         return 1
+    #     else:
+    #         return p*lieDistribution(rv, rvTruth, c, queryValue)
+
+    # prob = rv.apply(cost).expectation()
+    prob = 1
     if abs(h) <= 1e-9:
         return 0
     if abs(prob) <= 1e-9:
@@ -23,7 +30,7 @@ def optimization(c, rv=None, rvTruth=None, p=0):
     # return queryRV.entropy()
 
 # the probability that you will lie, given that you are able to.
-def lieDistribution(rv, rvTruth):
+def lieDistribution(rv, rvTruth, c, answer):
     # rate = 1000
     # p = np.exp(-rate)*rate**n/(math.factorial(n))
     # poisson sucks lol
@@ -72,7 +79,7 @@ while wordRV.entropy() > 1E-3:
     # update word pdf
     # truthValue = wordRV.apply(queryResult(c, answer))
     # print(truthValue[False])
-    pLieHere = pTruth * lieDistribution(wordRV, wordRVTruth)
+    pLieHere = pTruth * lieDistribution(wordRV, wordRVTruth, c, answer)
     wordRV = wordRV.fuzzyCondition(wordRVTruth, query(c), answer, pLieHere)
     wordRVTruth = wordRVTruth.condition(query(c), answer)
     pTruth = pTruth - pLieHere
