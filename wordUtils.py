@@ -24,3 +24,6 @@ def topRV(wordLength, cutoff=10000, sampling='uniform'):
 # returns a function that takes in a word and replaces everything in it that isn't a specific character with _.
 def query(c):
     return lambda word: re.sub(f'[^{c}]', "_", word)
+
+def queryResult(c, answer):
+    return lambda word: re.sub(f'[^{c}]', "_", word) == answer
