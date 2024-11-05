@@ -8,8 +8,6 @@ import math
 
 def optimization(c, rv=None):
     queryRV = rv.apply(query(c))
-    # going back to regular entropy for now
-    return queryRV.entropy()
     # h = queryRV.entropy()
     # # classic floating point precision
     # if abs(h) <= 1e-9:
@@ -17,6 +15,9 @@ def optimization(c, rv=None):
     # if abs(queryRV['_'*n]) <= 1e-9:
     #     return float('inf')
     # return h/queryRV['_'*n]
+    
+    # going back to regular entropy for now
+    return queryRV.entropy()
 
 def lieDistribution(n):
     # rate = 1000
@@ -37,7 +38,7 @@ wordRVTruth = topRV(n, cutoff=100000, sampling='frequency')
 pTruth = 1.0
 count = 1
 mistakes = 0
-while wordRV.entropy() > 1E-10:
+while wordRV.entropy() > 1E-5:
     if mistakes==7:
         break
     # guess a character
@@ -57,7 +58,7 @@ while wordRV.entropy() > 1E-10:
     while len(answer) != n or not re.match(f'^[{c}_]*$', answer):
         answer = input("Invalid answer. Try again.\n")
 
-    print(answer)
+    print(c, ': ', answer)
     info.append((c, answer))
     # print(info)
 
@@ -65,7 +66,7 @@ while wordRV.entropy() > 1E-10:
     # truthValue = wordRV.apply(queryResult(c, answer))
     # print(truthValue[False])
     wordRV = wordRV.fuzzyCondition(wordRVTruth, query(c), answer, lieDistribution(count))
-    wordRVTruth = wordRV.condition(query(c), answer)
+    wordRVTruth = wordRVTruth.condition(query(c), answer)
     # print(f'Current most likely word: {max(wordRV.pdf, key=wordRV.pdf.get)}, p={max(wordRV.pdf.values())}')
     count += 1
 if mistakes == 7 or len(list(wordRV.pdf.keys()))==0:
