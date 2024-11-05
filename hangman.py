@@ -37,7 +37,8 @@ wordRVTruth = topRV(n, cutoff=100000, sampling='frequency')
 pTruth = 1.0
 count = 1
 mistakes = 0
-while wordRV.entropy() > 1E-10:
+while wordRV.entropy() > 1E-3:
+    print(wordRV.entropy())
     if mistakes==7:
         break
     # guess a character
@@ -46,6 +47,8 @@ while wordRV.entropy() > 1E-10:
     outStr = ["_"]*n
     for (l, ans) in info:
         for i in range(len(ans)):
+            if outStr[i]==l and ans[i]=="_":
+                outStr[i] = "_"
             if ans[i]!="_":
                 outStr[i] = l
 
@@ -57,7 +60,7 @@ while wordRV.entropy() > 1E-10:
     while len(answer) != n or not re.match(f'^[{c}_]*$', answer):
         answer = input("Invalid answer. Try again.\n")
 
-    print(answer)
+    # print(answer)
     info.append((c, answer))
     # print(info)
 
