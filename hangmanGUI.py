@@ -13,6 +13,8 @@ def clickLetter(i, letter):
             buttons[i].config(text = letter)
         elif (buttons[i].cget("text")==letter):
             buttons[i].config(text = "_")
+        else:
+            buttons[i].config(text = letter)
     return func
 def clickDone(letter):
     def func():
