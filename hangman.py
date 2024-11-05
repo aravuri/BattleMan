@@ -15,7 +15,7 @@ def optimization(c, rv=None):
     # if abs(queryRV['_'*n]) <= 1e-9:
     #     return float('inf')
     # return h/queryRV['_'*n]
-    
+
     # going back to regular entropy for now
     return queryRV.entropy()
 
@@ -38,7 +38,8 @@ wordRVTruth = topRV(n, cutoff=100000, sampling='frequency')
 pTruth = 1.0
 count = 1
 mistakes = 0
-while wordRV.entropy() > 1E-5:
+while wordRV.entropy() > 1E-3:
+    print(wordRV.entropy())
     if mistakes==7:
         break
     # guess a character
@@ -47,6 +48,8 @@ while wordRV.entropy() > 1E-5:
     outStr = ["_"]*n
     for (l, ans) in info:
         for i in range(len(ans)):
+            if outStr[i]==l and ans[i]=="_":
+                outStr[i] = "_"
             if ans[i]!="_":
                 outStr[i] = l
 
