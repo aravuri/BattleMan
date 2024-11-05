@@ -1,6 +1,6 @@
 import wordfreq
 from functools import partial
-from infoTheoryUtils import *
+from hangUtils import *
 import re
 
 def isValid(word, length):
@@ -19,7 +19,7 @@ def topRV(wordLength, cutoff=10000, sampling='uniform'):
         func = lambda word: (word, wordfreq.word_frequency(word, 'en'))
     else:
         raise RuntimeError("oops")
-    return RV(normalize(dict(map(func, arr))))
+    return hangRV(normalize(dict(map(func, arr))))
 
 # returns a function that takes in a word and replaces everything in it that isn't a specific character with _.
 def query(c):
