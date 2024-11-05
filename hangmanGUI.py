@@ -11,17 +11,19 @@ def clickLetter(i, letter):
     def func():
         if (buttons[i].cget("text")=="_"):
             buttons[i].config(text = letter)
-            buttons[i].config(state = DISABLED)
+        elif (buttons[i].cget("text")==letter):
+            buttons[i].config(text = "_")
     return func
-def clickDone():
-    global positions
-    positions = []
-    for i in range(len(buttons)-1):
-        if (buttons[i].cget("stat") == DISABLED):
-            positions.append(i)
-            buttons[i].config(state = NORMAL)
-    buttons[-1].config(state = DISABLED)
-    root.quit()
+def clickDone(letter):
+    def func():
+        global positions
+        positions = []
+        for i in range(len(buttons)-1):
+            if (buttons[i].cget("text") == letter):
+                positions.append(i)
+        buttons[-1].config(state = DISABLED)
+        root.quit()
+    return func
 def guessing(word, letter, number, numMistakes, wordRV):
     root.geometry(str(len(word)*50+50)+"x600")
     textFrame = Frame(root)
@@ -32,7 +34,7 @@ def guessing(word, letter, number, numMistakes, wordRV):
     inputFrame.grid(row=1, column = 0)
     global buttons 
     buttons = [Button(inputFrame, text = word[i], command = clickLetter(i, letter)) for i in range(len(word))]
-    buttons.append(Button(inputFrame, text = "Done", command = clickDone))
+    buttons.append(Button(inputFrame, text = "Done", command = clickDone(letter)))
 
     for i in range(len(buttons)):
         buttons[i].grid(row=0,column = i)
