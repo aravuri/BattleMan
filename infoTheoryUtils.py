@@ -63,7 +63,7 @@ class Channel:
     # inputSet = sampleSpace(X)
     # outputSet = sampleSpace(Y) 
     # transitionFunction(x ϵ sampleSpace(X), y ϵ sampleSpace(Y)) = P(Y=y | X=x)
-    def __init__(self, inputSet: list, outputSet: list, transitionFunction: function):
+    def __init__(self, inputSet: list, outputSet: list, transitionFunction: type(print)):
         self.inputSet = inputSet
         self.inputCode = {k: v for v, k in enumerate(inputSet)}
         self.outputSet = outputSet
