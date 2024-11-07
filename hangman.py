@@ -9,7 +9,16 @@ import math
 def optimization(c, rv=None, rvTruth=None, p=0):
     queryRV = rv.apply(query(c))
 
-    h = queryRV.entropy()
+    def transition(input, output):
+        if (output == input):
+            return 1 if output == '_'*n else 1 - p*lieDistribution(rv, rvTruth, c, output)
+        elif (output == '_'*n):
+            return p*lieDistribution(rv, rvTruth, c, output)
+        return 0
+            
+    c = Channel(list(queryRV.pdf.keys()), list(queryRV.pdf.keys()), transition)
+    queryRVReal = c.transformDistribution(queryRV)
+    h = queryRVReal.entropy()
     # classic floating point precision
 
     # def cost(queryValue):

@@ -63,12 +63,13 @@ class Channel:
     # inputSet = sampleSpace(X)
     # outputSet = sampleSpace(Y) 
     # transitionFunction(x ϵ sampleSpace(X), y ϵ sampleSpace(Y)) = P(Y=y | X=x)
-    def __init__(self, inputSet: list, outputSet: list, transitionFunction: function):
+    def __init__(self, inputSet: list, outputSet: list, transitionFunction):
         self.inputSet = inputSet
         self.inputCode = {k: v for v, k in enumerate(inputSet)}
         self.outputSet = outputSet
         self.outputCode = {k: v for v, k in enumerate(outputSet)}
-        self.transitionMatrix = np.fromfunction(lambda inId, outId: transitionFunction(inputSet[inId], outputSet[outId]), (len(inputSet), len(outputSet)))
+
+        self.transitionMatrix = np.array([[transitionFunction(i, j) for i in inputSet] for j in outputSet])
     
     # type = input or output
     def vectorizeRV(self, rv: RV, type: str):
@@ -79,15 +80,13 @@ class Channel:
             code = self.outputCode
             set = self.outputSet
         
-        codeRV = rv.apply(lambda x: self.code[x])
-        return np.array([codeRV[i] for i in range(len(self.set))])
+        codeRV = rv.apply(lambda x: code[x])
+        return np.array([codeRV[i] for i in range(len(set))])
     
     def devectorizeRV(self, vector: np.ndarray, type: str):
         if type == 'input':
-            code = self.inputCode
             set = self.inputSet
         elif type == 'output':
-            code = self.outputCode
             set = self.outputSet
         
         return RV({set[id]: p for id, p in enumerate(vector)})
@@ -95,7 +94,7 @@ class Channel:
 
     def transformDistribution(self, inputRV: RV):
         inputVector = self.vectorizeRV(inputRV, type='input')
-        outputVector = self.transitionMatrix * inputVector
+        outputVector = self.transitionMatrix.dot(inputVector)
         return self.devectorizeRV(outputVector, type='output')
         
         
