@@ -11,10 +11,8 @@ def optimization(c, rv=None, rvTruth=None, p=0):
 
     def transition(input, output):
         if (output == input):
-            return 1 if output == '_'*n else 1 - p*lieDistribution(rv, rvTruth, c, output)
-        elif (output == '_'*n):
-            return p*lieDistribution(rv, rvTruth, c, output)
-        return 0
+            return 1 - p*lieDistribution(rv, rvTruth, c, output)
+        return p*lieDistribution(rv, rvTruth, c, output)*queryRV[output]/(1 - queryRV[input])
             
     c = Channel(list(queryRV.pdf.keys()), list(queryRV.pdf.keys()), transition)
     queryRVReal = c.transformDistribution(queryRV)
