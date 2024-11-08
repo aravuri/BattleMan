@@ -4,7 +4,7 @@ from PIL import ImageTk, Image
 def initGUI():
     root = Tk()
     root.title("Hangman")
-    root.geometry("300x50")
+    root.geometry("450x50")
     return root
 
 def clickLetter(i, letter):
@@ -77,7 +77,7 @@ def finishCall(root, text):
     root.mainloop()
 
 def startCall(root):
-    entrylbl = Label(root, text = "How many letters?")
+    entrylbl = Label(root, text = "List the number of letters in each word (e.g. 1, 5, 3, 4)")
     entrylbl.grid(row = 0, column = 0)
     entry = Entry(root)
     entry.grid(row = 1, column = 0)
