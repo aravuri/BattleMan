@@ -47,7 +47,7 @@ root = initGUI()
 
 possibleGuesses = list(string.ascii_lowercase)
 
-n = list(map(int,re.split(",\s*",startCall(root))))[0]
+n = list(map(int,re.split(",\\s*",startCall(root))))[0]
 info = []
 
 wordRV = topRV(n, cutoff=100000, sampling='frequency') # the distribution of words given that there have been either 0 or 1 lies so far.
