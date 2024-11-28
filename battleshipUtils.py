@@ -41,13 +41,21 @@ class battleRV():
 
     # state = 'hit' / 'miss'    
     def condition(self, x, y, state):
+        kernel = translateKernel(x, y).astype(bool)
+        
+        hitSlice = np.where(kernel, self.probabilities, 0)
+        missSlice = np.where(kernel, 0, self.probabilities)
+        pHit = np.sum(hitSlice)
+
         if state == 'hit':
-            return
+            for i in range(len(LEGAL_BOATS)):
+                missSlice[i] = missSlice[i]/np.sum(missSlice[i])
+            for i in range(len(LEGAL_BOATS)):
+                self.probabilities[i] = (self.probabilities[i] - missSlice[i]*(1-pHit))/pHit
         elif state == 'miss':
-            kernel = translateKernel(x, y)
-            self.probabilities[kernel.astype(bool)] = 0
-            normalizeBattleship(self.probabilities)
-            return
+            for i in range(len(LEGAL_BOATS)):
+                missSlice[i] = missSlice[i]/np.sum(missSlice[i])
+            self.probabilities = missSlice
         else:
             raise RuntimeError("oops")
 
@@ -57,7 +65,3 @@ def translateKernel(x, y):
     ret = np.roll(ret, x - 9, axis=2)
     ret = np.roll(ret, y - 9, axis=3)
     return ret[:, :, 0:10, 0:10]
-
-def normalizeBattleship(probabilities):
-    for i in range(len(LEGAL_BOATS)):
-        probabilities[i] = probabilities[i]/np.sum(probabilities[i])

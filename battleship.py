@@ -13,7 +13,7 @@ def printBoard(arr):
 
 game = [[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,4,0],[2,0,0,0,0,0,0,0,4,0],[0,0,0,0,0,0,0,0,4,0],[0,0,3,3,3,0,0,0,4,0],[0,0,0,0,0,0,0,0,0,0],[0,5,5,5,5,5,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]]
 remainingShips = [1,2,3,4,5]
-printBoard(game)
+# printBoard(game)
 
 guesses=np.zeros((10,10),dtype=int)
 
@@ -46,11 +46,15 @@ shipRV = battleRV(probabilities)
 # print(shipRV.getShipHitDistribution())
 print(shipRV.getHitDistribution())
 
-shipRV.condition(4, 5, 'miss')
-# print(shipRV.probabilities)
+shipRV.condition(4, 4, 'miss')
+print(shipRV.probabilities)
 # print(shipRV.getShipHitDistribution())
 print(shipRV.getHitDistribution())
 
+shipRV.condition(5, 4, 'hit')
+print(shipRV.probabilities)
+# print(shipRV.getShipHitDistribution())
+print(shipRV.getHitDistribution())
 
 # guess(0, 3, guesses, game)
 # guess(0, 4, guesses, game)
