@@ -1,9 +1,10 @@
 import numpy as np
+from battleshipUtils import *
+np.set_printoptions(precision=3)
 
 # game1 = np.zeros((10,10))
 # game2 = np.zeros((10,10))
 
-LEGAL_BOATS = [2,3,3,4,5]
 
 def printBoard(arr):
     for i in range(len(arr)):
@@ -31,17 +32,31 @@ def checkShips(remainingShips, game):
             remainingShips.remove(n)
             break
 
+probabilities = np.zeros((len(LEGAL_BOATS), 2, 10, 10))
+for i, length in enumerate(LEGAL_BOATS):
+    probabilities[i, 0, 0:1-length, :] = 1/(10*(10-length+1))
+    probabilities[i, 1, :, 0:1-length] = 1/(10*(10-length+1))
 
-guess(0, 3, guesses, game)
-guess(0, 4, guesses, game)
+# print(probabilities)
+np.full((len(LEGAL_BOATS), 2, 10, 10), 1/200)
 
-guess(2, 0, guesses, game)
-guess(3, 0, guesses, game)
-guess(4, 0, guesses, game)
 
-guess(3, 8, guesses, game)
-guess(4, 8, guesses, game)
-guess(5, 8, guesses, game)
-guess(6, 8, guesses, game)
+shipRV = battleRV(probabilities)
+print(shipRV.getShipHitDistribution())
+print(shipRV.getHitDistribution())
+
+
+
+# guess(0, 3, guesses, game)
+# guess(0, 4, guesses, game)
+
+# guess(2, 0, guesses, game)
+# guess(3, 0, guesses, game)
+# guess(4, 0, guesses, game)
+
+# guess(3, 8, guesses, game)
+# guess(4, 8, guesses, game)
+# guess(5, 8, guesses, game)
+# guess(6, 8, guesses, game)
  
 
