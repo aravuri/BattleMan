@@ -34,8 +34,8 @@ def checkShips(remainingShips, game):
 
 probabilities = np.zeros((len(LEGAL_BOATS), 2, 10, 10))
 for i, length in enumerate(LEGAL_BOATS):
-    probabilities[i, 0, 0:1-length, :] = 1/(10*(10-length+1))
-    probabilities[i, 1, :, 0:1-length] = 1/(10*(10-length+1))
+    probabilities[i, 0, 0:1-length, :] = 1/(10*(10-length+1))*0.5
+    probabilities[i, 1, :, 0:1-length] = 1/(10*(10-length+1))*0.5
 
 # print(probabilities)
 np.full((len(LEGAL_BOATS), 2, 10, 10), 1/200)
@@ -44,6 +44,7 @@ np.full((len(LEGAL_BOATS), 2, 10, 10), 1/200)
 shipRV = battleRV(probabilities)
 print(shipRV.getShipHitDistribution())
 print(shipRV.getHitDistribution())
+print(shipRV.getHitDistribution().sum()) # should be the total number of battleship tiles? checks out?
 
 
 

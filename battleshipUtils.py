@@ -35,4 +35,5 @@ class battleRV():
         
     # returns a 2d numpy array: (x, y) -> probability of hit
     def getHitDistribution(self):
+        # ignore ship
         return self.getShipHitDistribution().sum(axis=0)
