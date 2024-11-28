@@ -26,6 +26,7 @@ class battleRV():
         # i'm using a for loop for now but i will try to replace it with a vectorized version bc funny
         ret = np.zeros(self.probabilities.shape)
         for i in range(len(LEGAL_BOATS)):
+            # correlate is convolve but it doesn't flip
             ret[i, 0] = correlate(self.probabilities[i, 0], CONV_KERNEL[i, 0], mode='constant', origin=(2, 2))
             ret[i, 1] = correlate(self.probabilities[i, 1], CONV_KERNEL[i, 1], mode='constant', origin=(2, 2))
 
@@ -37,3 +38,26 @@ class battleRV():
     def getHitDistribution(self):
         # ignore ship
         return self.getShipHitDistribution().sum(axis=0)
+
+    # state = 'hit' / 'miss'    
+    def condition(self, x, y, state):
+        if state == 'hit':
+            return
+        elif state == 'miss':
+            kernel = translateKernel(x, y)
+            self.probabilities[kernel.astype(bool)] = 0
+            normalizeBattleship(self.probabilities)
+            return
+        else:
+            raise RuntimeError("oops")
+
+
+def translateKernel(x, y):
+    ret = np.pad(CONV_KERNEL, ((0, 0), (0, 0), (5, 10), (5, 10)))
+    ret = np.roll(ret, x - 9, axis=2)
+    ret = np.roll(ret, y - 9, axis=3)
+    return ret[:, :, 0:10, 0:10]
+
+def normalizeBattleship(probabilities):
+    for i in range(len(LEGAL_BOATS)):
+        probabilities[i] = probabilities[i]/np.sum(probabilities[i])

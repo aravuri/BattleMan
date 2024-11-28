@@ -42,10 +42,14 @@ np.full((len(LEGAL_BOATS), 2, 10, 10), 1/200)
 
 
 shipRV = battleRV(probabilities)
-print(shipRV.getShipHitDistribution())
+# print(shipRV.probabilities)
+# print(shipRV.getShipHitDistribution())
 print(shipRV.getHitDistribution())
-print(shipRV.getHitDistribution().sum()) # should be the total number of battleship tiles? checks out?
 
+shipRV.condition(4, 5, 'miss')
+# print(shipRV.probabilities)
+# print(shipRV.getShipHitDistribution())
+print(shipRV.getHitDistribution())
 
 
 # guess(0, 3, guesses, game)
