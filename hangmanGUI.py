@@ -13,7 +13,7 @@ def clickLetter(i, letter):
             buttons[i].config(text = letter)
         elif (buttons[i].cget("text")==letter):
             buttons[i].config(text = "_")
-        else:
+        elif (buttons[i].cget("text")!=" "):
             buttons[i].config(text = letter)
     return func
 def clickDone(letter):
@@ -42,7 +42,7 @@ def guessing(word, letter, number, numMistakes, wordRV):
     
     textFrame2 = Frame(root)
     textFrame2.grid(row=2, column=0)
-    text = Label(textFrame2, text="Most Likely Words:\n"+wordRV.topString(10))
+    text = Label(textFrame2, text="")#Most Likely Words:\n"+wordRV.topString(10))
     text.grid(row = 0, column=0)
      
     imageFrame = Frame(root)
@@ -65,7 +65,7 @@ def guessCall(root, word, letter, number, numMistakes, wordRV):
     destroy(root)
     globalizeRoot(root)
     guessing(word, letter, number, numMistakes, wordRV)
-    ret = ["_"]*len(word)
+    ret = ["_" if word[i]!=" " else " " for i in range(len(word))]
     for i in range(len(ret)):
         if i in positions:
             ret[i] = letter
