@@ -46,16 +46,29 @@ class battleRV():
         hitSlice = np.where(kernel, self.probabilities, 0)
         missSlice = np.where(kernel, 0, self.probabilities)
         pHit = np.sum(hitSlice)
-
         if state == 'hit':
             for i in range(len(LEGAL_BOATS)):
-                missSlice[i] = missSlice[i]/np.sum(missSlice[i])
-            for i in range(len(LEGAL_BOATS)):
-                self.probabilities[i] = (self.probabilities[i] - missSlice[i]*(1-pHit))/pHit
+                for theta in (0,1):
+                    for x in range(10):
+                        for y in range(10):
+                            if hitSlice[i,theta,x,y]!=0:
+                                self.probabilities[i,theta,x,y]/=(pHit)
+                            else:
+                                self.probabilities[i,theta,x,y]/=(pHit-np.sum(hitSlice[i]))
+            #            for i in range(len(LEGAL_BOATS)):
+            #    missSlice[i] = missSlice[i]/np.sum(missSlice[i])
+            #for i in range(len(LEGAL_BOATS)):
+            #    self.probabilities[i] = (self.probabilities[i] - missSlice[i]*(1-pHit))/pHit
         elif state == 'miss':
+            tempP = self.probabilities
+            self.condition(x, y, 'hit')
+            otherTempP = self.probabilities
+            self.probabilities = tempP
             for i in range(len(LEGAL_BOATS)):
-                missSlice[i] = missSlice[i]/np.sum(missSlice[i])
-            self.probabilities = missSlice
+                for theta in (0,1):
+                    for x in range(10):
+                        for y in range(10):
+                            self.probabilities[i,theta,x,y]=(self.probabilities[i,theta,x,y]-tempP[i,theta,x,y])/pHit
         else:
             raise RuntimeError("oops")
 
