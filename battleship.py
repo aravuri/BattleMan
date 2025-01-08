@@ -2,59 +2,63 @@ import numpy as np
 from battleshipUtils import *
 np.set_printoptions(precision=3)
 
-# game1 = np.zeros((10,10))
-# game2 = np.zeros((10,10))
-
-
-def printBoard(arr):
-    for i in range(len(arr)):
-        print(arr[i])
-
-
-game = [[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,0,0],[2,0,0,0,0,0,0,0,4,0],[2,0,0,0,0,0,0,0,4,0],[0,0,0,0,0,0,0,0,4,0],[0,0,3,3,3,0,0,0,4,0],[0,0,0,0,0,0,0,0,0,0],[0,5,5,5,5,5,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]]
-remainingShips = [1,2,3,4,5]
-# printBoard(game)
-
-guesses=np.zeros((10,10),dtype=int)
-
-def guess(x, y, guesses, game):
-    print("Guessing ("+str(x)+","+str(y)+")!")
-    guesses[x][y]=1
-    if game[x][y]!=0:
-        game[x][y]=6
-    printBoard(game) 
-    checkShips(remainingShips, game)
-    print("Remaining ships:"+str(remainingShips))
-def checkShips(remainingShips, game):
-    for n in remainingShips:
-        if n not in np.array(game).flatten():
-            print(str(n)+" is down!")
-            remainingShips.remove(n)
-            break
 
 probabilities = np.zeros((len(LEGAL_BOATS), 2, 10, 10))
 for i, length in enumerate(LEGAL_BOATS):
     probabilities[i, 0, 0:1-length, :] = 1/(10*(10-length+1))*0.5
     probabilities[i, 1, :, 0:1-length] = 1/(10*(10-length+1))*0.5
 
-# print(probabilities)
-np.full((len(LEGAL_BOATS), 2, 10, 10), 1/200)
+def inputCoordsSwitch(x,y):
+    return (11-x, 11-y)
 
-
+def argmaxArrayNotInQueries(a, q):
+    maxVal = float('-inf')
+    ret=(0,0)
+    for i in range(len(a)):
+        for j in range(len(a[i])):
+            if (i,j) not in q and a[i,j]>maxVal:
+                maxVal=a[i,j]
+                ret=(i,j)
+    return ret
 shipRV = battleRV(probabilities)
+#print(shipRV.probabilities)
+#print(shipRV.getShipHitDistribution())
+#print(shipRV.getHitDistribution())
+remainingShips=[1,1,1,1,1]
+previousQueries=[]
+while 1 in remainingShips:
+    print(remainingShips)
+    (x,y)= argmaxArrayNotInQueries(shipRV.getHitDistribution(), previousQueries) #(np.unravel_index(shipRV.getHitDistribution().argmax(),(10,10))[i].item() for i in [0,1])
+    previousQueries.append((x,y))
+    result = (input("Hit at "+str(inputCoordsSwitch(x,y))+"? Answer y or n.")=="y")
+    if result:
+        shipRV.condition(x,y,'hit')
+        shipSunk = int(input("Sunk ship? 0 if nothing sunk otherwise size of ship."))
+        if shipSunk==2:
+            remainingShips[0]=0
+        elif shipSunk==3:
+            if remainingShips[1]==1:
+                remainingShips[1]=0
+            else:
+                remainingShips[2]=0
+        elif shipSunk==4:
+            remainingShips[3]=0
+        elif shipSunk==5:
+            remainingShips[4]=0
+        elif shipSunk!=0:
+            print("what are you doing")
+    else:
+        shipRV.condition(x,y,'miss')
+
+#shipRV.condition(4, 4, 'miss')
 # print(shipRV.probabilities)
 # print(shipRV.getShipHitDistribution())
-print(shipRV.getHitDistribution())
+# print(shipRV.getHitDistribution())
 
-shipRV.condition(4, 4, 'miss')
-print(shipRV.probabilities)
-# print(shipRV.getShipHitDistribution())
-print(shipRV.getHitDistribution())
-
-shipRV.condition(5, 4, 'hit')
+#shipRV.condition(5, 4, 'hit')
 # print(shipRV.probabilities)
-print(shipRV.getShipHitDistribution())
-print(shipRV.getHitDistribution())
+# print(shipRV.getShipHitDistribution())
+# print(shipRV.getHitDistribution())
 
 # guess(0, 3, guesses, game)
 # guess(0, 4, guesses, game)
