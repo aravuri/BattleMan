@@ -26,12 +26,14 @@ shipRV = battleRV(probabilities)
 #print(shipRV.getHitDistribution())
 remainingShips=[1,1,1,1,1]
 previousQueries=[]
+count = 0
 while 1 in remainingShips:
+    count+=1
     print(remainingShips)
     print(shipRV.getHitDistribution())
     (x,y)= argmaxArrayNotInQueries(shipRV.getHitDistribution(), previousQueries) #(np.unravel_index(shipRV.getHitDistribution().argmax(),(10,10))[i].item() for i in [0,1])
     previousQueries.append((x,y))
-    result = (input("Hit at "+str(inputCoordsSwitch(x, y))+"? Answer y or n.")=="y")
+    result = (input("Question " + str(count)+": Hit at "+str(inputCoordsSwitch(x, y))+"? Answer y or n.")=="y")
     if result:
         shipRV.condition(x,y,'hit')
         shipSunk = int(input("Sunk ship? 0 if nothing sunk otherwise size of ship."))
@@ -50,7 +52,7 @@ while 1 in remainingShips:
             print("what are you doing")
     else:
         shipRV.condition(x,y,'miss')
-
+print(count)
 #shipRV.condition(4, 4, 'miss')
 # print(shipRV.probabilities)
 # print(shipRV.getShipHitDistribution())

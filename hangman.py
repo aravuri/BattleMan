@@ -54,8 +54,8 @@ possibleGuesses = list(string.ascii_lowercase)
 n = list(map(int,re.split(",\\s*",startCall(root))))
 info = []
 
-wordRV = [topRV(n[i], cutoff=100000, sampling='frequency') for i in range(len(n))] # the distribution of words given that there have been either 0 or 1 lies so far.
-wordRVTruth = [topRV(n[i], cutoff=100000, sampling='frequency') for i in range(len(n))] # the distribution of words given that every statement so far has been true
+wordRV = [topRV(n[i], cutoff=1000000, sampling='frequency') for i in range(len(n))] # the distribution of words given that there have been either 0 or 1 lies so far.
+wordRVTruth = [topRV(n[i], cutoff=1000000, sampling='frequency') for i in range(len(n))] # the distribution of words given that every statement so far has been true
 pTruth = 1.0 # the probability that every statement so far has been true
 count = 1
 mistakes = 0
@@ -63,8 +63,8 @@ while entropy(wordRV) > 1E-3:
     if mistakes==7:
         break
     # guess a character
-    for rev in wordRV:
-        rev.printPDF(n=3)
+    #for rev in wordRV:
+    #    rev.printPDF(n=3)
     c = possibleGuesses[np.argmax(np.array(list(map(partial(optimization, rv=wordRV, rvTruth=wordRVTruth, p = pTruth), possibleGuesses))))]
     
     outStr = [ch for ch in " ".join(["_"*n[i] for i in range(len(n))])]
@@ -97,7 +97,7 @@ while entropy(wordRV) > 1E-3:
     pTruth = pTruth - pLieHere
     # print(f'Current most likely word: {max(wordRV.pdf, key=wordRV.pdf.get)}, p={max(wordRV.pdf.values())}')
     count += 1
-print([len(list(wordRV[i].pdf.keys())) for i in range(len(n))])
+# print([len(list(wordRV[i].pdf.keys())) for i in range(len(n))])
 if mistakes == 7 or 0 in [len(list(wordRV[i].pdf.keys())) for i in range(len(n))]:
     finishCall(root, "I failed.")
 else:

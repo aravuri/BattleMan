@@ -29,7 +29,9 @@ def guessing(word, letter, number, numMistakes, wordRV):
     root.geometry(str(len(word)*50+50)+"x600")
     textFrame = Frame(root)
     textFrame.grid(row = 0, column = 0)
-    letterAsked = Label(textFrame, text = str(number) + ". Is " + letter + " in your word?")
+    text = str(number+2) + ". Is " + letter + " in your word?" 
+    print(text)
+    letterAsked = Label(textFrame, text = text)
     letterAsked.grid(row = 0, column = 0)
     inputFrame = Frame(root)
     inputFrame.grid(row=1, column = 0)
@@ -71,13 +73,16 @@ def guessCall(root, word, letter, number, numMistakes, wordRV):
             ret[i] = letter
     return ''.join(ret)
 def finishCall(root, text):
+    print(text)
     destroy(root)
     lbl = Label(root, text = text)
     lbl.grid(row = 0, column = 0)
     root.mainloop()
 
 def startCall(root):
-    entrylbl = Label(root, text = "List the number of letters in each word (e.g. 1, 5, 3, 4)")
+    text="1. 2. List the number of letters in each word (e.g. 1, 5, 3, 4)"
+    print(text)
+    entrylbl = Label(root, text = text)
     entrylbl.grid(row = 0, column = 0)
     entry = Entry(root)
     entry.grid(row = 1, column = 0)

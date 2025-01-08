@@ -6,12 +6,12 @@ import re
 def isValid(word, length):
     return re.search("^[a-z]*$", word) and len(word) == length
 
-def top(wordLength, cutoff=10000):
+def top(wordLength, cutoff=10000000):
     words = wordfreq.top_n_list('en', cutoff, wordlist='best')
     return list(filter(partial(isValid, length=wordLength), words));
 
 # p(word), sampling = uniform or frequency
-def topRV(wordLength, cutoff=10000, sampling='uniform'):
+def topRV(wordLength, cutoff=10000000, sampling='uniform'):
     arr = top(wordLength, cutoff);
     if (sampling == 'uniform'):
         func = lambda word: (word, 1.0)
