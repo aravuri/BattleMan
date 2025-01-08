@@ -49,37 +49,39 @@ class battleRV():
         hitSlice = np.where(kernel, self.probabilities, 0)
         missSlice = np.where(kernel, 0, self.probabilities)
         pHit = np.sum(hitSlice)
+        updatedProbabilities = np.zeros(self.probabilities.shape)
+        for ship in range(len(LEGAL_BOATS)):
+            for theta in (0,1):
+                for x in range(10):
+                    for y in range(10):
+                        if kernel[ship,theta,x,y]:
+                            updatedProbabilities[ship,theta,x,y] = self.probabilities[ship,theta,x,y] * 1.0
+                        else:
+                            blockPoints = translateKernelReflect(x,y)[ship, theta]
+                            ret = np.zeros(self.probabilities.shape)
+                            for i in range(len(LEGAL_BOATS)):
+                                ret[i, 0] = convolve(blockPoints, CONV_KERNEL[i, 0], mode='constant', origin=(2, 2))
+                                ret[i, 1] = convolve(blockPoints, CONV_KERNEL[i, 1], mode='constant', origin=(2, 2))
+
+                            blockedProbabilities = np.where(ret, 0, self.probabilities)
+                            battleNormalize(blockedProbabilities)
+                            conditonalHitSlice = np.where(kernel, blockedProbabilities, 0)
+                            conditionalPHit = np.sum(conditonalHitSlice) - np.sum(conditonalHitSlice[ship])
+                            ret = ret.astype(bool)
+                            # print(ship, theta, x, y)
+                            # if ship == 3 and theta == 0 and x == 2 and y == 2:
+                                # print(blockPoints)
+                                # print(ret)
+                                # print(conditonalHitSlice)
+                                # print(pHit, conditionalPHit)
+                        
+                            updatedProbabilities[ship,theta,x,y] = self.probabilities[ship,theta,x,y] * conditionalPHit
+        battleNormalize(updatedProbabilities)
+        # print(updatedProbabilities)
         if state == 'hit':
-            updatedProbabilities = np.zeros(self.probabilities.shape)
-            for ship in range(len(LEGAL_BOATS)):
-                for theta in (0,1):
-                    for x in range(10):
-                        for y in range(10):
-                            if kernel[ship,theta,x,y]:
-                                updatedProbabilities[ship,theta,x,y] = self.probabilities[ship,theta,x,y] * 1.0
-                            else:
-                                blockPoints = translateKernelReflect(x,y)[ship, theta]
-                                ret = np.zeros(self.probabilities.shape)
-                                for i in range(len(LEGAL_BOATS)):
-                                    ret[i, 0] = convolve(blockPoints, CONV_KERNEL[i, 0], mode='constant', origin=(2, 2))
-                                    ret[i, 1] = convolve(blockPoints, CONV_KERNEL[i, 1], mode='constant', origin=(2, 2))
-                                
-                                conditonalHitSlice = np.where(ret, 0, hitSlice)
-                                conditionalPHit = np.sum(conditonalHitSlice) - np.sum(conditonalHitSlice[ship])
-                                ret = ret.astype(bool)
-                                # print(ship, theta, x, y)
-                                if ship == 3 and theta == 0 and x == 2 and y == 2:
-                                    print(blockPoints)
-                                    print(ret)
-                                    print(conditonalHitSlice)
-                                    print(pHit, conditionalPHit)
-                            
-                                updatedProbabilities[ship,theta,x,y] = self.probabilities[ship,theta,x,y] * conditionalPHit
-            battleNormalize(updatedProbabilities)
-            print(updatedProbabilities)
             self.probabilities = updatedProbabilities
         elif state == 'miss':
-            pass
+            self.probabilities = (self.probabilities - updatedProbabilities*pHit)/(1.0 - pHit)
         else:
             raise RuntimeError("oops")
 
