@@ -1,6 +1,6 @@
 import infoTheoryUtils
 import numpy as np
-from scipy.ndimage import correlate
+from scipy.ndimage import correlate, convolve
 
 
 LEGAL_BOATS = [2,3,3,4,5]
@@ -10,7 +10,10 @@ for i, length in enumerate(LEGAL_BOATS):
     CONV_KERNEL[i, 0, -length:, -1] = 1
     CONV_KERNEL[i, 1, -1, -length:] = 1
 
+CONV_KERNEL_REFLECT = CONV_KERNEL[:, :, ::-1, ::-1]
+
 # print(CONV_KERNEL)
+# print(CONV_KERNEL_REFLECT)
 
 # extending RV is really annoying if you're not using a dictionary, maybe I should have thought of that
 class battleRV():
@@ -40,35 +43,43 @@ class battleRV():
         return self.getShipHitDistribution().sum(axis=0)
 
     # state = 'hit' / 'miss'    
-    def condition(self, x, y, state):
-        kernel = translateKernel(x, y).astype(bool)
+    def condition(self, x0, y0, state):
+        kernel = translateKernel(x0, y0).astype(bool)
         
         hitSlice = np.where(kernel, self.probabilities, 0)
         missSlice = np.where(kernel, 0, self.probabilities)
         pHit = np.sum(hitSlice)
         if state == 'hit':
-            for i in range(len(LEGAL_BOATS)):
+            updatedProbabilities = np.zeros(self.probabilities.shape)
+            for ship in range(len(LEGAL_BOATS)):
                 for theta in (0,1):
                     for x in range(10):
                         for y in range(10):
-                            if hitSlice[i,theta,x,y]!=0:
-                                self.probabilities[i,theta,x,y]/=(pHit)
+                            if kernel[ship,theta,x,y]:
+                                updatedProbabilities[ship,theta,x,y] = self.probabilities[ship,theta,x,y] * 1.0
                             else:
-                                self.probabilities[i,theta,x,y]/=(pHit-np.sum(hitSlice[i]))
-            #            for i in range(len(LEGAL_BOATS)):
-            #    missSlice[i] = missSlice[i]/np.sum(missSlice[i])
-            #for i in range(len(LEGAL_BOATS)):
-            #    self.probabilities[i] = (self.probabilities[i] - missSlice[i]*(1-pHit))/pHit
+                                blockPoints = translateKernelReflect(x,y)[ship, theta]
+                                ret = np.zeros(self.probabilities.shape)
+                                for i in range(len(LEGAL_BOATS)):
+                                    ret[i, 0] = convolve(blockPoints, CONV_KERNEL[i, 0], mode='constant', origin=(2, 2))
+                                    ret[i, 1] = convolve(blockPoints, CONV_KERNEL[i, 1], mode='constant', origin=(2, 2))
+                                
+                                conditonalHitSlice = np.where(ret, 0, hitSlice)
+                                conditionalPHit = np.sum(conditonalHitSlice) - np.sum(conditonalHitSlice[ship])
+                                ret = ret.astype(bool)
+                                # print(ship, theta, x, y)
+                                if ship == 3 and theta == 0 and x == 2 and y == 2:
+                                    print(blockPoints)
+                                    print(ret)
+                                    print(conditonalHitSlice)
+                                    print(pHit, conditionalPHit)
+                            
+                                updatedProbabilities[ship,theta,x,y] = self.probabilities[ship,theta,x,y] * conditionalPHit
+            battleNormalize(updatedProbabilities)
+            print(updatedProbabilities)
+            self.probabilities = updatedProbabilities
         elif state == 'miss':
-            tempP = self.probabilities
-            self.condition(x, y, 'hit')
-            otherTempP = self.probabilities
-            self.probabilities = tempP
-            for i in range(len(LEGAL_BOATS)):
-                for theta in (0,1):
-                    for x in range(10):
-                        for y in range(10):
-                            self.probabilities[i,theta,x,y]=(self.probabilities[i,theta,x,y]-tempP[i,theta,x,y])/pHit
+            pass
         else:
             raise RuntimeError("oops")
 
@@ -78,3 +89,13 @@ def translateKernel(x, y):
     ret = np.roll(ret, x - 9, axis=2)
     ret = np.roll(ret, y - 9, axis=3)
     return ret[:, :, 0:10, 0:10]
+
+def translateKernelReflect(x, y):
+    ret = np.pad(CONV_KERNEL_REFLECT, ((0, 0), (0, 0), (5, 10), (5, 10)))
+    ret = np.roll(ret, x - 5, axis=2)
+    ret = np.roll(ret, y - 5, axis=3)
+    return ret[:, :, 0:10, 0:10]
+
+def battleNormalize(probabilities):
+    for i in range(len(LEGAL_BOATS)):
+        probabilities[i] = probabilities[i] / np.sum(probabilities[i])
